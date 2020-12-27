@@ -1,0 +1,94 @@
+<html>
+    <title>WebGl - drawing on canvas</title>
+    <body onload = "initDraw()">
+        <canvas id="draw-surface" width="800" height="600" onmousedown="mouseDown(event)" onmousemove="mouseDragged(event)" onmouseup="mouseUp(event)">
+            your browser does not support HTML5
+        </canvas>
+        <br>
+        
+        <script type="x-shader/x-vertex" id="vertexShader">
+            precision mediump float;
+
+            uniform vec3 vertPosition;
+            //attribute vec3 color;
+            //attribute vec3 boxPosition;
+            //attribute vec3 vertColor;
+            //attribute vec2 boxTexCoord;
+            //varying vec3 fragColor; 
+
+            void main()
+            {
+                //fragColor = color;
+                //textureCoord = vec2(vertPosition.x*0.5+0.5, vertPosition.y*0.5+0.5);
+                gl_Position = vec4(vertPosition, 1.0);
+                gl_PointSize = 5.0;
+            }
+        </script>
+
+        <script type="x-shader/x-fragment" id="fragmentShader">
+            precision mediump float;
+
+            //varying vec3 fragColor;
+            //uniform sampler2D tex;
+
+            void main()
+            {
+                //gl_FragColor = texture2D(tex, textureCoord);
+                gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            }
+        </script>
+
+        <script type="x-shader/x-vertex" id="fadeVertexShader">
+            precision mediump float;
+
+            attribute vec3 boxPosition;
+            attribute vec2 boxTexCoord;
+            varying vec2 textureCoord;
+
+            void main(){
+                gl_Position = vec4(boxPosition, 1.0);
+                textureCoord = boxTexCoord;
+            }
+        </script>
+
+        <script type="x-shader/x-fragment" id="fadeFragmentShader">
+            precision mediump float;
+
+            varying vec2 textureCoord;
+            uniform sampler2D sampler;
+
+            void main(){
+                gl_FragColor = texture2D(sampler, textureCoord-vec2(-0.002, -0.002))-vec4(0.005,0.005,0.005,0.0); 
+            }
+        </script>
+
+        <script type="x-shader/x-vertex" id="displayVertexShader">
+            precision mediump float;
+
+            attribute vec3 boxPosition;
+            attribute vec2 boxTexCoord;
+            varying vec2 textureCoord;
+
+            void main(){
+                gl_Position = vec4(boxPosition, 1.0);
+                textureCoord = boxTexCoord;
+            }
+        </script>
+
+        <script type="x-shader/x-fragment" id="displayFragmentShader">
+            precision mediump float;
+
+            varying vec2 textureCoord;
+            uniform sampler2D sampler;
+
+            void main(){
+                gl_FragColor = texture2D(sampler, textureCoord);; 
+            }
+        </script>
+
+        
+        <img id="ind-image" src="indian-flag-with-grunge-texture_1035-1002.jpg" style="width:128px;height:128px;display:none;"></img>
+        <script src="gl-matrix.js"></script>
+        <script src="fadeDraw.js"></script>
+    </body>
+</html>
