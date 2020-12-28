@@ -64,6 +64,7 @@ var initDraw = function(){
     var textureProgram = createProgram(document.getElementById("vertexShader").innerHTML, document.getElementById("fragmentShader").innerHTML);
     var fadeProgram = createProgram(document.getElementById("fadeVertexShader").innerHTML, document.getElementById("fadeFragmentShader").innerHTML);
     var displayProgram = createProgram(document.getElementById("displayVertexShader").innerHTML, document.getElementById("displayFragmentShader").innerHTML);
+    var advectProgram = createProgram(document.getElementById("baseVertexShader", document.getElementById("advectShader")));
 
     var texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -72,15 +73,15 @@ var initDraw = function(){
     // fill texture with 3x2 pixels
     const level = 0;
     const internalFormat = gl.RGBA;
-    const width = 800;
-    const height = 600;
-    const border = 0;
+    // const width = 800;
+    // const height = 600;
+    // const border = 0;
     const format = gl.RGBA;
     const type = gl.UNSIGNED_BYTE;
-    const data = null;
+    const data = document.getElementById('ind-image');
     const alignment = 1;
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, alignment);
-    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, border,
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, /*width, height, border,*/
                   format, type, data);
 
     // set the filtering so we don't need mips and it's not filtered
@@ -220,7 +221,7 @@ var initDraw = function(){
     var loop = function () {
         ///draw the first primitive
         gl.bindFramebuffer(gl.FRAMEBUFFER, activeFrameBuffer[i%2]);
-        // gl.bindTexture(gl.TEXTURE_2D, texture1);
+        gl.bindTexture(gl.TEXTURE_2D, activeTexture[i%2]);
         // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         
@@ -229,7 +230,7 @@ var initDraw = function(){
             gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT); //gl.clear clears the target texture that you have set as the frame buffer to the clear color (target texture can be a texture that you created or the display. your problem was that you cleared yout target texture and therefore cleared the points that were rendered to it in the previous iteration. so possibly, you might not wanna clear ant texture except for the display.)
             // firstPass=false;
         }
-        drawDrawing(textureProgram);
+        fadeDrawing(displayProgram);
 
         //fade the texture
         gl.bindFramebuffer(gl.FRAMEBUFFER, activeFrameBuffer[(i+1)%2]);
@@ -242,9 +243,9 @@ var initDraw = function(){
         fadeDrawing(fadeProgram);
 
 
-        //display the texture
+        // //display the texture
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.bindTexture(gl.TEXTURE_2D, activeTexture[i%2]);
+        gl.bindTexture(gl.TEXTURE_2D, activeTexture[(i)%2]);
         gl.clearColor(0.5, 0.0, 0.5, 1.0);
         gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
         fadeDrawing(displayProgram);
@@ -253,7 +254,7 @@ var initDraw = function(){
         
 
         //switch the two textures
-        i+=1;
+        // i+=1;
         // var temp = texture1;
         // texture2=texture1;
         // texture1=temp;

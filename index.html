@@ -82,12 +82,68 @@
             uniform sampler2D sampler;
 
             void main(){
-                gl_FragColor = texture2D(sampler, textureCoord);; 
+                gl_FragColor = texture2D(sampler, textureCoord); 
             }
         </script>
+        <script type="x-shader/x-fragment" id="advectShader">
+            precision mediump float;
+            precision mediump sampler2D;
+    
+            uniform sampler2D toAdvect;
+            uniform sampler2D inputVelocity;
+    
+            uniform float timeStep;
+            uniform vec2 texelSize;
+    
+            varying vec2 texelCoord;
+            vec4 bilerp (sampler2D sam, vec2 uv, vec2 tsize) {
+              vec4 s;
+              vec2 st = uv / tsize - 0.5;
+              s.xy = floor(st) + 0.5;
+              s.zw = s.xy + 1.0;
+              vec2 t = fract(st);
+    
+              vec4 a = texture2D(sam, s.xy * tsize);
+              vec4 b = texture2D(sam, s.zy * tsize);
+              vec4 c = texture2D(sam, s.xw * tsize);
+              vec4 d = texture2D(sam, s.zw * tsize);
+    
+              return mix(mix(a, b, t.x), mix(c, d, t.x), t.y);
+            }
+    
+            void main()
+            {
+              vec2 pos = texelCoord - timeStep * texture2D(inputVelocity, texelCoord).xy * texelSize;
+              gl_FragColor = bilerp(toAdvect, pos, texelSize);
+            }
+          </script>
+          <script type="x-shader/x-vertex" id="baseVertexShader">
+            precision mediump float;
+    
+            attribute vec2 vertPosition;
+    
+            varying vec2 texelCoord;
+            varying vec2 left;
+            varying vec2 right;
+            varying vec2 top;
+            varying vec2 bottom;
+    
+            uniform vec2 texelSize;
+    
+            void main()
+            {
+              texelCoord = vertPosition * 0.5 + 0.5;
+              left = texelCoord - vec2(texelSize.x, 0.0);
+              right = texelCoord + vec2(texelSize.x, 0.0);
+              top = texelCoord + vec2(0.0, texelSize.y);
+              bottom = texelCoord - vec2(0.0, texelSize.y);
+    
+              gl_Position = vec4(vertPosition, 0.0, 1.0);
+            }
+          </script>
 
         
-        <img id="ind-image" src="indian-flag-with-grunge-texture_1035-1002.jpg" style="width:128px;height:128px;display:none;"></img>
+        <img id="ind-image" src="SKY.png" style="width:128px;height:128px;display:none;"></img>
         <script src="gl-matrix.js"></script>
         <script src="fadeDraw.js"></script>
     </body>
